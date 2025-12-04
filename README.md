@@ -147,11 +147,7 @@ results/
 │   ├── profiles.py            # Data profile computation
 │   └── plots.py               # Plot generation
 ├── scripts/
-│   ├── run_all.py                  # Main entry point - runs everything
-│   ├── run_all_experiments.py      # Legacy: 500-eval only (use run_all.py instead)
-│   ├── run_experiments_2000.py     # Legacy: 2000-eval only (use run_all.py instead)
-│   ├── generate_tau_plots.py       # Legacy: plots only (use run_all.py instead)
-│   └── regenerate_profiles_tau.py   # Legacy: CSV profiles only (use run_all.py instead)
+│   └── run_all.py                  # Main entry point - runs everything
 ├── results/                   # Output directory (created automatically)
 │   └── plots/                 # Plot files (created automatically)
 ├── requirements.txt           # Python dependencies
