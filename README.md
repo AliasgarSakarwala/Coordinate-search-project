@@ -8,6 +8,8 @@ This project benchmarks three Coordinate Search variants (Complete, Ordered, Opp
 
 ### Option 1: Clone from GitHub
 
+In your terminal, run:
+
 **Mac / Linux:**
 ```bash
 git clone https://github.com/AliasgarSakarwala/Math462-Coordinate-search-project.git
@@ -25,7 +27,10 @@ cd Math462-Coordinate-search-project
 1. Go to the GitHub repository
 2. Click "Code" → "Download ZIP"
 3. Extract the ZIP file
-4. Open terminal/command prompt in the extracted folder
+4. In your terminal, navigate to the extracted folder:
+   ```bash
+   cd Math462-Coordinate-search-project
+   ```
 
 ### Project Structure
 
@@ -45,19 +50,25 @@ Math462-Coordinate-search-project/
 
 ## Installation
 
+In your terminal, navigate to the project directory and install dependencies:
+
 ### Mac / Linux
 ```bash
+cd Math462-Coordinate-search-project
 pip3 install -r requirements.txt
 ```
 
 ### Windows
 ```bash
+cd Math462-Coordinate-search-project
 python -m pip install -r requirements.txt
 ```
 
 **Dependencies:** numpy, pandas, matplotlib
 
 ## Running the Experiments
+
+In your terminal, run the main script:
 
 ### Mac / Linux
 ```bash
@@ -75,6 +86,8 @@ This single command:
 - Generates all data profiles and plots for τ = 1e-3, 1e-2, 1e-1
 
 **Runtime:** ~2-5 minutes (depends on your computer)
+
+You should see progress messages as the experiments run, and the script will print a summary when complete.
 
 ## Results Organization
 
@@ -108,6 +121,128 @@ Each folder contains:
 - **data_profile_evals.csv**: Evaluation budget data profile
 - **data_profile_time.csv**: CPU time data profile
 - **data_profile_*.png**: Visualization plots
+
+## Viewing Results
+
+In your terminal, you can view the generated files using the following commands:
+
+### View CSV Files
+
+**Mac / Linux:**
+```bash
+# View raw runs data (500 evaluations, tau=1e-3)
+cat results/N500_tau1e-3/raw_runs.csv | head -20
+
+# View evaluation data profile (500 evaluations, tau=1e-3)
+cat results/N500_tau1e-3/data_profile_evals.csv | head -20
+
+# View CPU time data profile (500 evaluations, tau=1e-3)
+cat results/N500_tau1e-3/data_profile_time.csv | head -20
+
+# View raw runs data (2000 evaluations, tau=1e-3)
+cat results/N2000_tau1e-3/raw_runs.csv | head -20
+
+# View evaluation data profile (2000 evaluations, tau=1e-3)
+cat results/N2000_tau1e-3/data_profile_evals.csv | head -20
+
+# View CPU time data profile (2000 evaluations, tau=1e-3)
+cat results/N2000_tau1e-3/data_profile_time.csv | head -20
+
+# View other tau values (example for tau=1e-2, 500 evaluations)
+cat results/N500_tau1e-2/data_profile_evals.csv | head -20
+cat results/N500_tau1e-2/data_profile_time.csv | head -20
+
+# View tau=1e-1 (500 evaluations)
+cat results/N500_tau1e-1/data_profile_evals.csv | head -20
+cat results/N500_tau1e-1/data_profile_time.csv | head -20
+```
+
+**Windows:**
+```bash
+# View raw runs data (500 evaluations, tau=1e-3)
+type results\N500_tau1e-3\raw_runs.csv | more
+
+# View evaluation data profile (500 evaluations, tau=1e-3)
+type results\N500_tau1e-3\data_profile_evals.csv | more
+
+# View CPU time data profile (500 evaluations, tau=1e-3)
+type results\N500_tau1e-3\data_profile_time.csv | more
+
+# View raw runs data (2000 evaluations, tau=1e-3)
+type results\N2000_tau1e-3\raw_runs.csv | more
+
+# View evaluation data profile (2000 evaluations, tau=1e-3)
+type results\N2000_tau1e-3\data_profile_evals.csv | more
+
+# View CPU time data profile (2000 evaluations, tau=1e-3)
+type results\N2000_tau1e-3\data_profile_time.csv | more
+```
+
+### Open Plot Images
+
+**Mac / Linux:**
+```bash
+# Open evaluation profile plots
+open results/N500_tau1e-3/data_profile_evals.png
+open results/N500_tau1e-3/data_profile_time.png
+open results/N2000_tau1e-3/data_profile_evals.png
+open results/N2000_tau1e-3/data_profile_time.png
+
+# Open plots for other tau values
+open results/N500_tau1e-2/data_profile_evals.png
+open results/N500_tau1e-2/data_profile_time.png
+open results/N500_tau1e-1/data_profile_evals.png
+open results/N500_tau1e-1/data_profile_time.png
+open results/N2000_tau1e-2/data_profile_evals.png
+open results/N2000_tau1e-2/data_profile_time.png
+open results/N2000_tau1e-1/data_profile_evals.png
+open results/N2000_tau1e-1/data_profile_time.png
+```
+
+**Windows:**
+```bash
+# Open evaluation profile plots
+start results\N500_tau1e-3\data_profile_evals.png
+start results\N500_tau1e-3\data_profile_time.png
+start results\N2000_tau1e-3\data_profile_evals.png
+start results\N2000_tau1e-3\data_profile_time.png
+
+# Open plots for other tau values
+start results\N500_tau1e-2\data_profile_evals.png
+start results\N500_tau1e-2\data_profile_time.png
+start results\N500_tau1e-1\data_profile_evals.png
+start results\N500_tau1e-1\data_profile_time.png
+start results\N2000_tau1e-2\data_profile_evals.png
+start results\N2000_tau1e-2\data_profile_time.png
+start results\N2000_tau1e-1\data_profile_evals.png
+start results\N2000_tau1e-1\data_profile_time.png
+```
+
+### List All Results Folders
+
+**Mac / Linux:**
+```bash
+ls -la results/
+```
+
+**Windows:**
+```bash
+dir results
+```
+
+### Navigate to Results Folder
+
+**Mac / Linux:**
+```bash
+cd results
+ls -la
+```
+
+**Windows:**
+```bash
+cd results
+dir
+```
 
 ## Project Structure
 
