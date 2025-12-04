@@ -1,7 +1,7 @@
 """
 Wrapper for SOLAR10 function with evaluation counting and CPU time tracking.
 
-We use a mock implementation of SOLAR10 since the real package isn't easily available.
+We use a mock implementation of SOLAR10 since the real package isn't available.
 The mock is based on the real SOLAR simulator structure - see solar_mock.py for details.
 """
 
