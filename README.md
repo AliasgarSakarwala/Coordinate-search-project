@@ -16,7 +16,7 @@ cd Math462-Coordinate-search-project
 
 **Windows:**
 ```bash
-git clone <https://github.com/AliasgarSakarwala/Math462-Coordinate-search-project.git
+git clone https://github.com/AliasgarSakarwala/Math462-Coordinate-search-project.git
 cd Math462-Coordinate-search-project
 ```
 
