@@ -3,15 +3,20 @@ This module handles running all the experiments.
 
 We generate 30 random starting points, then run all three algorithms
 on each one. That gives us 90 runs total (30 instances × 3 algorithms).
+
+Can run with different max_evals values (500 or 2000) by passing a parameter.
 """
 
 import numpy as np
 import pandas as pd
 from .config import (
     DIM, N_INSTANCES, DOMAIN_LOW, DOMAIN_HIGH,
-    GLOBAL_SEED, INSTANCE_SEED_OFFSET
+    GLOBAL_SEED, INSTANCE_SEED_OFFSET, MAX_EVALS as DEFAULT_MAX_EVALS,
+    MAX_CPU_TIME as DEFAULT_MAX_CPU_TIME, EVAL_BUDGET_STEP as DEFAULT_EVAL_BUDGET_STEP
 )
 from .solar_wrapper import SolarWrapper
+# Import algorithms module so we can temporarily override MAX_EVALS if needed
+import experiments.algorithms as algo_module
 from .algorithms import (
     complete_coordinate_search,
     ordered_coordinate_search,
@@ -35,7 +40,7 @@ def generate_starting_points():
     return starting_points
 
 
-def run_experiments():
+def run_experiments(max_evals=None, eval_budget_step=None):
     """
     Run all three algorithms on all 30 instances.
     
@@ -48,8 +53,21 @@ def run_experiments():
     We reset the random seed before each algorithm so they all start
     with the same RNG state. This makes the comparison fair.
     
+    Args:
+        max_evals: Maximum evaluations (defaults to config.MAX_EVALS)
+        eval_budget_step: Step size for evaluation budgets (defaults to config.EVAL_BUDGET_STEP)
+    
     Returns a DataFrame with all the results.
     """
+    # If max_evals is different from default, temporarily override it in algorithms module
+    if max_evals is None:
+        max_evals = DEFAULT_MAX_EVALS
+    
+    # Temporarily override MAX_EVALS in algorithms if needed
+    old_max_evals = None
+    if max_evals != DEFAULT_MAX_EVALS:
+        old_max_evals = algo_module.MAX_EVALS
+        algo_module.MAX_EVALS = max_evals
     # Generate all starting points at once
     starting_points = generate_starting_points()
     
@@ -120,6 +138,10 @@ def run_experiments():
             'evals': evals_opcs,
             'cpu_time': cpu_time_opcs
         })
+    
+    # Restore original MAX_EVALS if we changed it
+    if old_max_evals is not None:
+        algo_module.MAX_EVALS = old_max_evals
     
     # Convert to DataFrame and return
     df = pd.DataFrame(results)

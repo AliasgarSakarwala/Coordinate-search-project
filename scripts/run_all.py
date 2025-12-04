@@ -18,8 +18,7 @@ import pandas as pd
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from experiments.experiment_runner import run_experiments as run_experiments_500
-from experiments.experiment_runner_2000 import run_experiments as run_experiments_2000
+from experiments.experiment_runner import run_experiments
 from experiments.profiles import (
     compute_best_known_value,
     compute_success,
@@ -31,7 +30,10 @@ from experiments.plots import (
     plot_data_profile_time
 )
 from experiments.config import MAX_EVALS as MAX_EVALS_500, EVAL_BUDGET_STEP as EVAL_BUDGET_STEP_500, TAU as DEFAULT_TAU
-from experiments.config_2000 import MAX_EVALS as MAX_EVALS_2000, EVAL_BUDGET_STEP as EVAL_BUDGET_STEP_2000
+
+# 2000-eval experiment settings
+MAX_EVALS_2000 = 2000
+EVAL_BUDGET_STEP_2000 = 20
 
 
 def run_single_experiment(run_experiments_func, max_evals, eval_budget_step, suffix, results_dir):
@@ -144,12 +146,14 @@ def main():
     
     # Step 1: Run 500-eval experiment
     df_500, f_star_500 = run_single_experiment(
-        run_experiments_500, MAX_EVALS_500, EVAL_BUDGET_STEP_500, '', results_dir
+        lambda: run_experiments(max_evals=MAX_EVALS_500), 
+        MAX_EVALS_500, EVAL_BUDGET_STEP_500, '', results_dir
     )
     
     # Step 2: Run 2000-eval experiment
     df_2000, f_star_2000 = run_single_experiment(
-        run_experiments_2000, MAX_EVALS_2000, EVAL_BUDGET_STEP_2000, '_2000', results_dir
+        lambda: run_experiments(max_evals=MAX_EVALS_2000),
+        MAX_EVALS_2000, EVAL_BUDGET_STEP_2000, '_2000', results_dir
     )
     
     # Step 3: Generate all profiles and plots for 500-eval
