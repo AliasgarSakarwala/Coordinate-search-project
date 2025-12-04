@@ -139,13 +139,11 @@ results/
 .
 ├── experiments/
 │   ├── __init__.py
-│   ├── config.py              # Global configuration constants (500 evals)
-│   ├── config_2000.py         # Configuration for 2000-eval experiment
+│   ├── config.py              # Global configuration constants
 │   ├── solar_wrapper.py       # SOLAR10 wrapper with evaluation/time tracking
 │   ├── solar_mock.py          # Mock SOLAR10 function implementation
 │   ├── algorithms.py          # Three CS variant implementations
-│   ├── experiment_runner.py   # Experiment execution (500 evals)
-│   ├── experiment_runner_2000.py  # Experiment execution (2000 evals)
+│   ├── experiment_runner.py   # Experiment execution (supports both 500 and 2000 evals)
 │   ├── profiles.py            # Data profile computation
 │   └── plots.py               # Plot generation
 ├── scripts/
