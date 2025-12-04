@@ -31,143 +31,77 @@ This will install:
 
 ## Detailed Execution Instructions
 
-### Step 1: Run the 500-Evaluation Experiment
+### Running All Experiments
 
-Execute the main experiment script:
+Simply run the unified script that executes everything:
 
 ```bash
-python scripts/run_all_experiments.py
+python scripts/run_all.py
 ```
 
-**What this does:**
-- Generates 30 random starting points in [-1, 1]¹⁰
-- Runs all three CS variants (Complete, Ordered, Opportunistic) on each instance
-- Computes the best-known objective value f* (minimum across all runs)
-- Applies the success criterion to determine which runs succeeded
-- Builds data profiles showing performance at different evaluation budgets
-- Saves results to CSV files
+**What this script does:**
+1. Runs the 500-evaluation experiment (all 3 algorithms on 30 instances)
+2. Runs the 2000-evaluation experiment (all 3 algorithms on 30 instances)
+3. Generates all data profiles (CSV files) for both experiments with τ = 1e-3, 1e-2, and 1e-1
+4. Generates all plots (PNG files) for both experiments with all three tolerance values
 
 **Expected output:**
 ```
 ============================================================
-Coordinate Search Variants Benchmark on SOLAR10
+Coordinate Search Variants Benchmark - Complete Pipeline
 ============================================================
 
-[1/5] Running experiments...
+============================================================
+Running 500-evaluation experiment
+============================================================
+[1/3] Running experiments (MAX_EVALS = 500)...
    Completed 90 runs across 30 instances
-
-[2/5] Computing best-known value...
-   f* = 4.205724e+01
-
-[3/5] Computing success criterion...
-   Overall success rate: 75.56%
-
-[4/5] Building data profiles...
-   Data profiles computed
-
-[5/5] Saving results...
+[2/3] Computing best-known value and success criterion...
+   f* = 4.205723e+01
+   Overall success rate: 100.00%
+[3/3] Saving raw data...
    Saved: results/raw_runs.csv
-   Saved: results/data_profile_evals.csv
-   Saved: results/data_profile_time.csv
 
-[Summary statistics printed here]
-```
-
-**Files created:**
-- `results/raw_runs.csv` - All 90 runs (30 instances × 3 algorithms) with their results
-- `results/data_profile_evals.csv` - Data profile by evaluation budget (τ=1e-3)
-- `results/data_profile_time.csv` - Data profile by CPU time (τ=1e-3)
-
-### Step 2: Run the 2000-Evaluation Experiment (Optional)
-
-For comparison, you can run the same experiment with a larger evaluation budget:
-
-```bash
-python scripts/run_experiments_2000.py
-```
-
-This does the same thing as Step 1 but with MAX_EVALS=2000 instead of 500.
-
-**Files created:**
-- `results/raw_runs_2000.csv`
-- `results/data_profiles_eval_2000.csv`
-- `results/data_profiles_time_2000.csv`
-
-### Step 3: Generate Plots
-
-Generate plots for different tolerance values (τ):
-
-```bash
-python scripts/generate_tau_plots.py
-```
-
-**What this does:**
-- Reads the raw run data from Step 1 (and Step 2 if you ran it)
-- Recomputes success criteria for τ = 1e-3, 1e-2, and 1e-1
-- Generates data profile plots for each tolerance value
-- Saves plots as PNG files
-
-**Expected output:**
-```
 ============================================================
-Generating Data Profile Plots with Different Tau Values
+Running 2000-evaluation experiment
 ============================================================
+[... similar output ...]
 
-[Processing for each tau value and experiment]
-  Saved: results/plots/data_profile_evals.png
-  Saved: results/plots/data_profile_time.png
-  [etc...]
+============================================================
+Generating profiles and plots for 500-eval experiment
+============================================================
+--- Processing tau = 1e-03 ---
+  Saved CSV: results/data_profile_evals.csv
+  Saved CSV: results/data_profile_time.csv
+  Saved plot: results/plots/data_profile_evals.png
+  Saved plot: results/plots/data_profile_time.png
+[... continues for all tau values and both experiments ...]
+
+All experiments completed successfully!
 ```
 
-**Files created:**
-- `results/plots/data_profile_evals.png` - Evaluation profile (τ=1e-3)
-- `results/plots/data_profile_time.png` - Time profile (τ=1e-3)
-- `results/plots/data_profile_evals_tau1e-2.png` - Evaluation profile (τ=1e-2)
-- `results/plots/data_profile_time_tau1e-2.png` - Time profile (τ=1e-2)
-- `results/plots/data_profile_evals_tau1e-1.png` - Evaluation profile (τ=1e-1)
-- `results/plots/data_profile_time_tau1e-1.png` - Time profile (τ=1e-1)
-- Plus corresponding `_2000` versions if Step 2 was run
+**Total runtime:** This will take a few minutes as it runs 180 total algorithm runs (90 for 500-evals + 90 for 2000-evals).
 
-### Step 4: Generate Additional Data Profiles (Optional)
+### Complete File Structure After Running
 
-If you want CSV files for the other tolerance values:
-
-```bash
-python scripts/regenerate_profiles_tau.py
-```
-
-**What this does:**
-- Recomputes success criteria for τ = 1e-2 and 1e-1
-- Generates data profile CSV files for these tolerance values
-- Does NOT generate plots (use Step 3 for that)
-
-**Files created:**
-- `results/data_profiles_eval_tau1e-2.csv`
-- `results/data_profiles_time_tau1e-2.csv`
-- `results/data_profiles_eval_tau1e-1.csv`
-- `results/data_profiles_time_tau1e-1.csv`
-- Plus `_2000` versions if Step 2 was run
-
-### Complete File Structure After Running All Steps
-
-After running all steps, your `results/` directory should contain:
+After running `scripts/run_all.py`, your `results/` directory will contain:
 
 ```
 results/
-├── raw_runs.csv                          # 500-eval raw data
-├── raw_runs_2000.csv                     # 2000-eval raw data (if Step 2 run)
+├── raw_runs.csv                          # 500-eval raw data (90 runs)
+├── raw_runs_2000.csv                     # 2000-eval raw data (90 runs)
 ├── data_profile_evals.csv                # 500-eval profile (τ=1e-3)
 ├── data_profile_time.csv                 # 500-eval time profile (τ=1e-3)
 ├── data_profiles_eval_tau1e-2.csv        # 500-eval profile (τ=1e-2)
 ├── data_profiles_eval_tau1e-1.csv        # 500-eval profile (τ=1e-1)
 ├── data_profiles_time_tau1e-2.csv        # 500-eval time profile (τ=1e-2)
 ├── data_profiles_time_tau1e-1.csv        # 500-eval time profile (τ=1e-1)
-├── data_profiles_eval_2000.csv           # 2000-eval profile (τ=1e-3, if Step 2 run)
-├── data_profiles_time_2000.csv           # 2000-eval time profile (τ=1e-3, if Step 2 run)
-├── data_profiles_eval_2000_tau1e-2.csv   # 2000-eval profile (τ=1e-2, if Step 2 run)
-├── data_profiles_eval_2000_tau1e-1.csv   # 2000-eval profile (τ=1e-1, if Step 2 run)
-├── data_profiles_time_2000_tau1e-2.csv   # 2000-eval time profile (τ=1e-2, if Step 2 run)
-└── data_profiles_time_2000_tau1e-1.csv   # 2000-eval time profile (τ=1e-1, if Step 2 run)
+├── data_profiles_eval_2000.csv           # 2000-eval profile (τ=1e-3)
+├── data_profiles_time_2000.csv           # 2000-eval time profile (τ=1e-3)
+├── data_profiles_eval_2000_tau1e-2.csv   # 2000-eval profile (τ=1e-2)
+├── data_profiles_eval_2000_tau1e-1.csv   # 2000-eval profile (τ=1e-1)
+├── data_profiles_time_2000_tau1e-2.csv   # 2000-eval time profile (τ=1e-2)
+├── data_profiles_time_2000_tau1e-1.csv   # 2000-eval time profile (τ=1e-1)
 └── plots/
     ├── data_profile_evals.png            # 500-eval plot (τ=1e-3)
     ├── data_profile_time.png              # 500-eval time plot (τ=1e-3)
@@ -175,13 +109,15 @@ results/
     ├── data_profile_time_tau1e-2.png     # 500-eval time plot (τ=1e-2)
     ├── data_profile_evals_tau1e-1.png    # 500-eval plot (τ=1e-1)
     ├── data_profile_time_tau1e-1.png     # 500-eval time plot (τ=1e-1)
-    ├── data_profile_evals_2000.png       # 2000-eval plot (τ=1e-3, if Step 2 run)
-    ├── data_profile_time_2000.png        # 2000-eval time plot (τ=1e-3, if Step 2 run)
-    ├── data_profile_evals_2000_tau1e-2.png  # 2000-eval plot (τ=1e-2, if Step 2 run)
-    ├── data_profile_time_2000_tau1e-2.png   # 2000-eval time plot (τ=1e-2, if Step 2 run)
-    ├── data_profile_evals_2000_tau1e-1.png  # 2000-eval plot (τ=1e-1, if Step 2 run)
-    └── data_profile_time_2000_tau1e-1.png   # 2000-eval time plot (τ=1e-1, if Step 2 run)
+    ├── data_profile_evals_2000.png       # 2000-eval plot (τ=1e-3)
+    ├── data_profile_time_2000.png        # 2000-eval time plot (τ=1e-3)
+    ├── data_profile_evals_2000_tau1e-2.png  # 2000-eval plot (τ=1e-2)
+    ├── data_profile_time_2000_tau1e-2.png   # 2000-eval time plot (τ=1e-2)
+    ├── data_profile_evals_2000_tau1e-1.png  # 2000-eval plot (τ=1e-1)
+    └── data_profile_time_2000_tau1e-1.png   # 2000-eval time plot (τ=1e-1)
 ```
+
+**Total files generated:** 14 CSV files + 12 PNG plots = 26 files
 
 ## Experimental Configuration
 
@@ -213,10 +149,11 @@ results/
 │   ├── profiles.py            # Data profile computation
 │   └── plots.py               # Plot generation
 ├── scripts/
-│   ├── run_all_experiments.py      # Main entry point (500 evals)
-│   ├── run_experiments_2000.py    # 2000-eval experiment
-│   ├── generate_tau_plots.py      # Generate plots for different tau values
-│   └── regenerate_profiles_tau.py  # Generate CSV profiles for different tau values
+│   ├── run_all.py                  # Main entry point - runs everything
+│   ├── run_all_experiments.py      # Legacy: 500-eval only (use run_all.py instead)
+│   ├── run_experiments_2000.py     # Legacy: 2000-eval only (use run_all.py instead)
+│   ├── generate_tau_plots.py       # Legacy: plots only (use run_all.py instead)
+│   └── regenerate_profiles_tau.py   # Legacy: CSV profiles only (use run_all.py instead)
 ├── results/                   # Output directory (created automatically)
 │   └── plots/                 # Plot files (created automatically)
 ├── requirements.txt           # Python dependencies
