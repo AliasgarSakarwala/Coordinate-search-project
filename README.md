@@ -10,13 +10,13 @@ This project benchmarks three Coordinate Search variants (Complete, Ordered, Opp
 
 **Mac / Linux:**
 ```bash
-git clone <your-repository-url>
+git clone https://github.com/AliasgarSakarwala/Math462-Coordinate-search-project.git
 cd Math462-Coordinate-search-project
 ```
 
 **Windows:**
 ```bash
-git clone <your-repository-url>
+git clone <https://github.com/AliasgarSakarwala/Math462-Coordinate-search-project.git
 cd Math462-Coordinate-search-project
 ```
 
