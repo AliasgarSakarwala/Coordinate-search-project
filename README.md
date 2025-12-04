@@ -4,6 +4,45 @@
 
 This project benchmarks three Coordinate Search variants (Complete, Ordered, Opportunistic) on the SOLAR10 optimization problem.
 
+## Getting Started
+
+### Option 1: Clone from GitHub
+
+**Mac / Linux:**
+```bash
+git clone <your-repository-url>
+cd Math462-Coordinate-search-project
+```
+
+**Windows:**
+```bash
+git clone <your-repository-url>
+cd Math462-Coordinate-search-project
+```
+
+### Option 2: Download from GitHub
+
+1. Go to the GitHub repository
+2. Click "Code" → "Download ZIP"
+3. Extract the ZIP file
+4. Open terminal/command prompt in the extracted folder
+
+### Project Structure
+
+After cloning/downloading, your project should look like:
+```
+Math462-Coordinate-search-project/
+├── experiments/          # Core implementation
+│   ├── algorithms.py     # Three CS variants
+│   ├── experiment_runner.py
+│   ├── profiles.py       # Data profile computation
+│   └── plots.py          # Plot generation
+├── scripts/
+│   └── run_all.py        # Main entry point
+├── requirements.txt      # Python dependencies
+└── README.md             # This file
+```
+
 ## Installation
 
 ### Mac / Linux
@@ -93,8 +132,43 @@ Each folder contains:
 - **Max evaluations**: 500 or 2000
 - **Success tolerance**: τ = 1e-3, 1e-2, or 1e-1
 
+## How CSV Files Are Created
+
+The CSV files are generated in `scripts/run_all.py`:
+
+1. **Raw Data Collection** (`experiments/experiment_runner.py`):
+   - Runs all three algorithms on 30 instances
+   - Collects: `instance_id`, `algo`, `f0`, `final_f`, `evals`, `cpu_time`
+   - Returns a pandas DataFrame with 90 rows (30 instances × 3 algorithms)
+
+2. **Success Evaluation** (`experiments/profiles.py` - `compute_success()` function):
+   - Computes best-known value: `f* = min(final_f)` across all runs
+   - For each run, checks: `(final_f - f*) ≤ τ × (f0 - f*)`
+   - Adds a `success` column (True/False) to the DataFrame
+   - **Location in code:** `experiments/profiles.py`, lines 23-45
+
+3. **Data Profile Creation** (`experiments/profiles.py`):
+   - `build_data_profile_evals()`: Creates evaluation budget profile
+   - `build_data_profile_time()`: Creates CPU time profile
+   - For each budget, counts how many instances each algorithm solved
+
+4. **CSV File Generation** (`scripts/run_all.py`):
+   - Saves raw data: `df.to_csv('raw_runs.csv')` (line 105)
+   - Saves profiles: `profile_evals.to_csv('data_profile_evals.csv')` (line 97)
+   - Saves time profiles: `profile_time.to_csv('data_profile_time.csv')` (line 98)
+
 ## Success Criterion
 
 A run succeeds if: `(final_f - f*) ≤ τ × (f0 - f*)`
+
+**Where this is evaluated:**
+- Function: `experiments/profiles.py` → `compute_success()` (lines 23-45)
+- Called from: `scripts/run_all.py` (line 57 for initial computation, line 87 for each tau value)
+
+**How it works:**
+1. Find best solution: `f* = min(final_f)` across all runs
+2. For each run, compute threshold: `threshold = τ × f0 + (1 - τ) × f*`
+3. Check if: `final_f ≤ threshold`
+4. If true, the run succeeded; otherwise it failed
 
 where f* is the best-known value across all runs.
