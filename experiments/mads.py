@@ -25,10 +25,14 @@ Two things distinguish this from a textbook GPS/MADS implementation:
 
 import numpy as np
 
-from .config import DELTA_0, DELTA_MIN, MAX_EVALS, MAX_CPU_TIME
+from .config import DELTA_0, DELTA_REDUCTION, DELTA_MIN, MAX_EVALS, MAX_CPU_TIME
 
-MESH_EXPANSION = 4.0
-MESH_CONTRACTION = 4.0
+# same growth/shrink rate as the coordinate search variants (just inverted
+# for growth) so the mesh takes about the same number of failed iterations
+# to bottom out - keeps the comparison against Complete/Ordered/
+# Opportunistic apples to apples instead of MADS quitting early
+MESH_EXPANSION = 1.0 / DELTA_REDUCTION
+MESH_CONTRACTION = DELTA_REDUCTION
 SEARCH_MIN_HISTORY_FACTOR = 2  # need at least 2n + 1 points before fitting
 
 
@@ -143,7 +147,7 @@ def mesh_adaptive_search(func, x0):
         if improved:
             mesh_size = min(mesh_size * MESH_EXPANSION, 1.0)
         else:
-            mesh_size /= MESH_CONTRACTION
+            mesh_size *= MESH_CONTRACTION
         poll_size = np.sqrt(mesh_size)
 
     return x, f_current, func.eval_count, func.cpu_time

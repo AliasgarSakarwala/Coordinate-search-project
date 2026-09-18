@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""Entry point for the whole benchmark: runs the experiments, builds the
-data profiles + plots, for both the 500-eval and 2000-eval budgets.
+"""Entry point for the whole benchmark: runs the experiments across the
+full problem suite, builds the data profiles + plots, for both the
+500-eval and 2000-eval budgets.
 
     python3 scripts/run_all.py
 """
@@ -18,7 +19,7 @@ from experiments.plots import plot_data_profile_evals, plot_data_profile_time
 from experiments.profiles import (
     build_data_profile_evals,
     build_data_profile_time,
-    compute_best_known_value,
+    compute_star_per_problem,
     compute_success,
 )
 
@@ -33,18 +34,18 @@ def run_single_experiment(max_evals):
 
     print(f"\n[1/2] Running experiments (MAX_EVALS = {max_evals})...")
     df = run_experiments(max_evals=max_evals)
-    print(f"   completed {len(df)} runs across {df['instance_id'].nunique()} instances")
+    print(f"   completed {len(df)} runs across {df['instance_id'].nunique()} instances "
+          f"({df['problem'].nunique()} problems)")
 
-    print("\n[2/2] Computing best-known value and success criterion...")
-    f_star = compute_best_known_value(df)
-    df["success"] = compute_success(df, f_star)
-    print(f"   f* = {f_star:.6e}")
+    print("\n[2/2] Computing best-known values and success criterion...")
+    f_star_by_problem = compute_star_per_problem(df)
+    df["success"] = compute_success(df, f_star_by_problem)
     print(f"   overall success rate: {df['success'].mean():.2%}")
 
-    return df, f_star
+    return df, f_star_by_problem
 
 
-def generate_profiles_and_plots(df, f_star, max_evals, eval_budget_step, results_dir):
+def generate_profiles_and_plots(df, f_star_by_problem, max_evals, eval_budget_step, results_dir):
     print(f"\n{'=' * 60}\nGenerating profiles and plots for {max_evals}-eval experiment\n{'=' * 60}")
 
     for tau in TAU_VALUES:
@@ -55,12 +56,12 @@ def generate_profiles_and_plots(df, f_star, max_evals, eval_budget_step, results
         os.makedirs(exp_folder, exist_ok=True)
 
         df_tau = df.copy()
-        df_tau["success"] = compute_success(df_tau, f_star, tau=tau)
+        df_tau["success"] = compute_success(df_tau, f_star_by_problem, tau=tau)
 
         profile_evals = build_data_profile_evals(
-            df_tau, f_star, max_evals=max_evals, eval_budget_step=eval_budget_step, tau=tau
+            df_tau, f_star_by_problem, max_evals=max_evals, eval_budget_step=eval_budget_step, tau=tau
         )
-        profile_time = build_data_profile_time(df_tau, f_star, tau=tau)
+        profile_time = build_data_profile_time(df_tau, f_star_by_problem, tau=tau)
 
         profile_evals.to_csv(os.path.join(exp_folder, "data_profile_evals.csv"), index=False)
         profile_time.to_csv(os.path.join(exp_folder, "data_profile_time.csv"), index=False)
@@ -76,7 +77,7 @@ def generate_profiles_and_plots(df, f_star, max_evals, eval_budget_step, results
 
 def main():
     print("=" * 60)
-    print("Coordinate Search Variants Benchmark - Full Pipeline")
+    print("Coordinate Search / MADS Benchmark - Full Pipeline")
     print("=" * 60)
 
     results_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "results")
