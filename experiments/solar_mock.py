@@ -1,79 +1,46 @@
-"""
-Mock implementation of the SOLAR10 function.
+"""Stand-in for the SOLAR10 benchmark.
 
-The real SOLAR10 is a C++ program that's hard to install, so we use a mock instead.
-I looked at the real SOLAR code on GitHub to understand what it does:
-- It's a cost minimization problem (lower is better)
-- The real version has 5 inputs, but our project needs 10 dimensions
-- It's deterministic (same input always gives same output)
-- The best known value is around 42.4
+SOLAR10 is normally distributed as a compiled C++ simulator (see the
+NOMAD/SOLAR benchmark suite), which isn't practical to build for this
+project. This module reproduces its rough shape instead: five inputs with
+the real function's physical bounds (collector temperature, storage sizes,
+etc.), a minimum around 42, and a roughly bowl-shaped cost surface with a
+couple of cross-terms so the coordinates aren't fully separable. The other
+five dimensions are along for the ride so the problem matches DIM = 10.
 
-This mock tries to capture the same behavior but works with 10D inputs.
+None of this is meant to be a faithful physical model - it's just something
+deterministic and reasonably interesting to optimize against.
 """
 
 import numpy as np
 
+# bounds used by the real SOLAR10 simulator for its five inputs
+_LB = np.array([793.0, 2.0, 2.0, 0.01, 0.01])
+_UB = np.array([995.0, 50.0, 30.0, 5.00, 5.00])
+
+_BASE_COST = 42.0
+_SCALE = 15.0
+
 
 def solar10(x):
-    """
-    Mock SOLAR10 function that takes a 10D point and returns a cost value.
-    
-    The real SOLAR10 has 5 inputs with specific physical meanings (temperature,
-    storage dimensions, etc.), but we need 10D for this project. So we:
-    1. Take the first 5 dimensions and map them to the real SOLAR10 bounds
-    2. Use the remaining 5 dimensions to add some extra complexity
-    3. Return a cost value that's in a similar range to the real function
-    """
+    """Evaluate the mock SOLAR10 cost at a 10-d point in [-1, 1]^10."""
     x = np.asarray(x)
     if x.shape != (10,):
-        raise ValueError(f"Expected shape (10,), got {x.shape}")
-    
-    # The real SOLAR10 uses these bounds for its 5 inputs
-    # We map our [-1, 1]^10 to these bounds for the first 5 dimensions
-    lb = np.array([793.0, 2.0, 2.0, 0.01, 0.01])  # Lower bounds
-    ub = np.array([995.0, 50.0, 30.0, 5.00, 5.00])  # Upper bounds
-    
-    # Transform first 5 dimensions from [-1, 1] to the real SOLAR10 bounds
-    x_solar = lb + (x[:5] + 1) / 2.0 * (ub - lb)
-    
-    # Normalize to [0, 1] to make the math easier
-    x_norm = (x_solar - lb) / (ub - lb)
-    
-    # Build a cost function that has some structure
-    # I'm using a mix of quadratic and exponential terms to make it interesting
-    result = 0.0
-    
-    # Quadratic penalties - being away from the center costs more
-    for i in range(5):
-        center = 0.5
-        result += 10.0 * (x_norm[i] - center)**2
-    
-    # Cross-terms - variables interact with each other
-    result += 5.0 * (x_norm[0] - x_norm[1])**2
-    result += 3.0 * (x_norm[2] - x_norm[3])**2
-    
-    # Exponential term to create a sharp minimum
-    result += 2.0 * np.exp(-5.0 * np.sum(x_norm**2))
-    
-    # Do some extra computation to make timing realistic
-    # (the real function does actual physics calculations)
-    _ = np.sum(np.sin(x_norm) * np.cos(x_norm))
-    _ = np.sum(np.exp(-0.1 * x_norm))
-    
-    # Scale the result to match the real SOLAR10's value range
-    # Real function has minimum around 42, typical values 40-200+
-    base_cost = 42.0
-    scaled_result = base_cost + result * 15.0
-    
-    # Use the remaining 5 dimensions (x[5:]) to add some extra cost
-    # They don't affect things as much as the main 5 dimensions
-    x_extra = x[5:]
-    extra_term = 0.3 * np.sum(x_extra**2)
-    scaled_result += extra_term
-    
-    # Make sure we don't go below the minimum we expect
-    if scaled_result < 40.0:
-        scaled_result = 40.0 + (40.0 - scaled_result) * 0.1
-    
-    return float(scaled_result)
+        raise ValueError(f"expected a length-10 vector, got shape {x.shape}")
 
+    x_solar = _LB + (x[:5] + 1.0) / 2.0 * (_UB - _LB)
+    x_norm = (x_solar - _LB) / (_UB - _LB)
+
+    cost = 10.0 * np.sum((x_norm - 0.5) ** 2)
+    cost += 5.0 * (x_norm[0] - x_norm[1]) ** 2
+    cost += 3.0 * (x_norm[2] - x_norm[3]) ** 2
+    cost += 2.0 * np.exp(-5.0 * np.sum(x_norm ** 2))
+
+    result = _BASE_COST + cost * _SCALE
+    result += 0.3 * np.sum(x[5:] ** 2)
+
+    # keep it from dipping meaningfully below the known SOLAR10 floor
+    if result < 40.0:
+        result = 40.0 + (40.0 - result) * 0.1
+
+    return float(result)
