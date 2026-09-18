@@ -41,3 +41,9 @@ Thumbs.db
 # Keep results directory structure but ignore contents
 !results/.gitkeep
 
+# ...but do track the curated plots/screenshots used in the README
+!docs/assets/*.png
+
+# local matplotlib/fontconfig cache dirs used when running scripts sandboxed
+.cache/
+
