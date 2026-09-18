@@ -8,14 +8,14 @@ direction to move in during the poll step:
 
 import numpy as np
 
-from .config import DIM, DELTA_0, DELTA_REDUCTION, DELTA_MIN, MAX_EVALS, MAX_CPU_TIME
+from .config import DELTA_0, DELTA_REDUCTION, DELTA_MIN, MAX_EVALS, MAX_CPU_TIME
 
 
-def _coordinate_directions():
-    """+e_i / -e_i for i = 0..DIM-1, i.e. the 2*DIM coordinate directions."""
-    basis = np.eye(DIM)
+def _coordinate_directions(n):
+    """+e_i / -e_i for i = 0..n-1, i.e. the 2n coordinate directions."""
+    basis = np.eye(n)
     directions = []
-    for i in range(DIM):
+    for i in range(n):
         directions.append(basis[i])
         directions.append(-basis[i])
     return directions
@@ -31,7 +31,7 @@ def complete_coordinate_search(func, x0):
     x = x0.copy()
     f_current = func.evaluate(x)
     delta = DELTA_0
-    directions = _coordinate_directions()
+    directions = _coordinate_directions(x0.shape[0])
 
     while delta >= DELTA_MIN and func.eval_count < MAX_EVALS and func.cpu_time < MAX_CPU_TIME:
         best_x = x.copy()
@@ -69,7 +69,7 @@ def ordered_coordinate_search(func, x0):
     x = x0.copy()
     f_current = func.evaluate(x)
     delta = DELTA_0
-    directions = _coordinate_directions()
+    directions = _coordinate_directions(x0.shape[0])
 
     while delta >= DELTA_MIN and func.eval_count < MAX_EVALS and func.cpu_time < MAX_CPU_TIME:
         improved = False
@@ -101,7 +101,7 @@ def opportunistic_coordinate_search(func, x0):
     x = x0.copy()
     f_current = func.evaluate(x)
     delta = DELTA_0
-    base_directions = _coordinate_directions()
+    base_directions = _coordinate_directions(x0.shape[0])
 
     while delta >= DELTA_MIN and func.eval_count < MAX_EVALS and func.cpu_time < MAX_CPU_TIME:
         improved = False
