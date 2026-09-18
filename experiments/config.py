@@ -1,10 +1,12 @@
 """Shared constants for the coordinate search experiments."""
 
-# problem dimension
+# problem dimension - every problem in the suite is evaluated at this
+# dimension so they all share one starting-point generator
 DIM = 10
 
-# number of problem instances per benchmark run
-N_INSTANCES = 30
+# random starts per problem in the benchmark suite (7 problems x 5 starts
+# = 35 total instances per experiment)
+STARTS_PER_PROBLEM = 5
 
 # search domain bounds
 DOMAIN_LOW = -1.0
