@@ -11,6 +11,8 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+import pandas as pd
+
 from experiments.config import EVAL_BUDGET_STEP as EVAL_BUDGET_STEP_500
 from experiments.config import MAX_EVALS as MAX_EVALS_500
 from experiments.config import TAU as DEFAULT_TAU
@@ -22,6 +24,7 @@ from experiments.profiles import (
     compute_star_per_problem,
     compute_success,
 )
+from experiments.stats_tests import summarize
 
 MAX_EVALS_2000 = 2000
 EVAL_BUDGET_STEP_2000 = 20
@@ -43,6 +46,24 @@ def run_single_experiment(max_evals):
     print(f"   overall success rate: {df['success'].mean():.2%}")
 
     return df, f_star_by_problem
+
+
+def run_significance_tests(df, max_evals, results_dir):
+    print(f"\n--- significance tests ({max_evals} evals) ---")
+    friedman, wilcoxon_df = summarize(df, baseline="MADS")
+    print(f"   Friedman chi2 = {friedman['statistic']:.3f}, p = {friedman['p_value']:.4f}")
+    print(f"   mean ranks (lower is better): {friedman['mean_rank']}")
+
+    out_path = os.path.join(results_dir, f"N{max_evals}_significance.csv")
+    wilcoxon_df.to_csv(out_path, index=False)
+    print(f"   saved {out_path}")
+
+    friedman_path = os.path.join(results_dir, f"N{max_evals}_friedman.csv")
+    pd.DataFrame([{"algo": k, "mean_rank": v} for k, v in friedman["mean_rank"].items()] +
+                 [{"algo": "friedman_statistic", "mean_rank": friedman["statistic"]},
+                  {"algo": "friedman_p_value", "mean_rank": friedman["p_value"]}]).to_csv(
+        friedman_path, index=False
+    )
 
 
 def generate_profiles_and_plots(df, f_star_by_problem, max_evals, eval_budget_step, results_dir):
@@ -88,6 +109,9 @@ def main():
 
     generate_profiles_and_plots(df_500, f_star_500, MAX_EVALS_500, EVAL_BUDGET_STEP_500, results_dir)
     generate_profiles_and_plots(df_2000, f_star_2000, MAX_EVALS_2000, EVAL_BUDGET_STEP_2000, results_dir)
+
+    run_significance_tests(df_500, MAX_EVALS_500, results_dir)
+    run_significance_tests(df_2000, MAX_EVALS_2000, results_dir)
 
     print("\n" + "=" * 60)
     print(f"Done. Results are in: {results_dir}")
