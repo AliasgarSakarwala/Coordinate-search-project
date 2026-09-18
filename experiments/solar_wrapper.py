@@ -1,58 +1,36 @@
-"""
-Wrapper for SOLAR10 function with evaluation counting and CPU time tracking.
+"""Thin wrapper around an objective function that counts evaluations and
+tracks wall-clock time spent inside the function itself.
 
-We use a mock implementation of SOLAR10 since the real package isn't available.
-The mock is based on the real SOLAR simulator structure - see solar_mock.py for details.
+Both numbers are needed for the data profiles later, since we care about
+"how many evaluations did it take" and "how much CPU time did it take"
+separately.
 """
 
 import time
-import numpy as np
+
 from .solar_mock import solar10
 
 
 class SolarWrapper:
+    """Counts calls and timing for the mock SOLAR10 function.
+
+    instance_id isn't used by solar10 itself right now (the mock is
+    deterministic) - it's kept around so callers can tag results by
+    instance without having to pass it through separately.
     """
-    Wraps the SOLAR10 function to track how many times we call it and how long it takes.
-    This is important for our experiments since we need to count evaluations and measure CPU time.
-    """
-    
+
     def __init__(self, instance_id):
-        """
-        Set up a new wrapper for tracking evaluations.
-        
-        The seed is set in experiment_runner.py before creating this wrapper,
-        so we don't need to worry about it here.
-        """
         self.instance_id = instance_id
-        self.eval_count = 0  # How many times we've called the function
-        self.cpu_time = 0.0  # Total time spent evaluating
-        self.start_time = None
-    
-    def evaluate(self, x):
-        """
-        Call SOLAR10 at point x and track the evaluation.
-        
-        We measure the time for each call and add it to our total.
-        This gives us accurate CPU time even if the function is fast.
-        """
-        if self.start_time is None:
-            self.start_time = time.perf_counter()
-        
-        # Time this specific evaluation
-        eval_start = time.perf_counter()
-        f_val = solar10(x)
-        eval_end = time.perf_counter()
-        
-        # Keep track of everything
-        self.eval_count += 1
-        self.cpu_time += (eval_end - eval_start)
-        
-        return float(f_val)
-    
-    def reset(self):
-        """Reset counters when starting a new algorithm run."""
         self.eval_count = 0
         self.cpu_time = 0.0
-        self.start_time = None
 
+    def evaluate(self, x):
+        t0 = time.perf_counter()
+        f_val = solar10(x)
+        self.cpu_time += time.perf_counter() - t0
+        self.eval_count += 1
+        return float(f_val)
 
+    def reset(self):
+        self.eval_count = 0
+        self.cpu_time = 0.0
