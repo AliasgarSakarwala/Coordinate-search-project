@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Coordinate Search / MADS - interactive demo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+<style>
+  :root {
+    --bg: #0f1117;
+    --panel: #171a23;
+    --border: #2a2e3a;
+    --text: #e7e9ee;
+    --muted: #9aa0ab;
+    --accent: #4f8cff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  header {
+    padding: 24px 32px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  header h1 { margin: 0 0 6px; font-size: 22px; }
+  header p { margin: 0; color: var(--muted); max-width: 780px; line-height: 1.5; font-size: 14px; }
+  main { padding: 24px 32px 48px; max-width: 1100px; margin: 0 auto; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 18px; }
+  .tab-btn {
+    background: var(--panel);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .tab-btn.active { border-color: var(--accent); color: var(--accent); }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .panel.hidden { display: none; }
+  .controls { display: flex; flex-wrap: wrap; gap: 18px; align-items: center; margin-bottom: 14px; }
+  .controls label { font-size: 13px; color: var(--muted); }
+  select {
+    background: #0f1117;
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+  .algo-toggles { display: flex; gap: 12px; }
+  .algo-toggles label { display: flex; align-items: center; gap: 6px; color: var(--text); font-size: 13px; }
+  .slider-row { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 260px; }
+  input[type="range"] { flex: 1; }
+  #playBtn {
+    background: var(--accent);
+    border: none;
+    color: white;
+    padding: 7px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  #evalLabel { font-size: 13px; color: var(--muted); min-width: 130px; text-align: right; }
+  .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; }
+  footer { text-align: center; color: var(--muted); font-size: 12px; padding: 12px 0 32px; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Coordinate Search vs. MADS - live search trajectories</h1>
+  <p>
+    Drag the slider (or hit play) to watch each solver's incumbent point walk across the
+    contour of a 2-D test function. Same four algorithms as the full 10-D benchmark suite,
+    just projected down to 2-D so the search paths are actually visible. See the
+    <a href="../README.md">README</a> for the full writeup and the real 10-D results.
+  </p>
+</header>
+
+<main>
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="landscape">Landscape trajectories</button>
+    <button class="tab-btn" data-tab="portfolio">Portfolio convergence</button>
+  </div>
+
+  <section id="landscape" class="panel">
+    <div class="controls">
+      <div>
+        <label for="functionSelect">Test function</label><br />
+        <select id="functionSelect">
+          <option value="Rastrigin">Rastrigin (multimodal)</option>
+          <option value="Rosenbrock">Rosenbrock (curved valley)</option>
+        </select>
+      </div>
+
+      <div class="algo-toggles">
+        <label><input type="checkbox" id="chk-Complete" checked /> <span class="swatch" style="background:#1f77b4"></span> Complete</label>
+        <label><input type="checkbox" id="chk-Ordered" checked /> <span class="swatch" style="background:#ff7f0e"></span> Ordered</label>
+        <label><input type="checkbox" id="chk-Opportunistic" checked /> <span class="swatch" style="background:#2ca02c"></span> Opportunistic</label>
+        <label><input type="checkbox" id="chk-MADS" checked /> <span class="swatch" style="background:#d62728"></span> MADS</label>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button id="playBtn">Play</button>
+      <div class="slider-row">
+        <input type="range" id="evalSlider" min="0" max="300" value="300" step="1" />
+        <span id="evalLabel">300 evaluations</span>
+      </div>
+    </div>
+
+    <div id="landscape-plot" style="width: 100%; height: 560px;"></div>
+  </section>
+
+  <section id="portfolio" class="panel hidden">
+    <p style="color: var(--muted); font-size: 13px; margin-top: 0;">
+      Same four algorithms, run on the 10-asset portfolio blackbox (negative Sharpe ratio,
+      plus a turnover cost penalty and a CVaR risk penalty - see experiments/finance_problem.py).
+      Lower is better.
+    </p>
+    <div id="portfolio-plot" style="width: 100%; height: 520px;"></div>
+  </section>
+</main>
+
+<footer>Static page, no backend - data baked in by demo/generate_demo_data.py.</footer>
+
+<script src="trajectories.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
