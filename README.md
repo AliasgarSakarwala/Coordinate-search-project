@@ -34,7 +34,7 @@ differentiate it.
 | Complete Coordinate Search | `experiments/algorithms.py` | fixed ±eᵢ axes | evaluate every direction, move to the best one |
 | Ordered Coordinate Search | `experiments/algorithms.py` | fixed ±eᵢ axes | move on the first improving direction found |
 | Opportunistic Coordinate Search | `experiments/algorithms.py` | shuffled ±eᵢ axes | ordered search, but re-shuffled every iteration |
-| **MADS** (this project's addition) | `experiments/mads.py` | random orthogonal spanning set, regenerated every iteration | mesh/poll size hierarchy + a quadratic-model search step before every poll |
+| **MADS** | `experiments/mads.py` | random orthogonal spanning set, regenerated every iteration | mesh/poll size hierarchy + a quadratic-model search step before every poll |
 
 The first three all live in the same family: they only ever poll along the
 coordinate axes, which means their search is intrinsically biased toward
